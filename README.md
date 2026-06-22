@@ -8,11 +8,11 @@ L'objectif de ce projet est de proposer une interface permettant de construire u
 
 ## Technologies utilisées
 
-- Frontend : Next.js
-- Backend : Express.js
-- ORM : Prisma
-- Base de données : PostgreSQL
-- Styles : Tailwind CSS
+- Frontend : Next.js, React, ReactDOM.
+- Backend : Express.js, Prisma, dotenv, cors, cookie-parser, jsonwebtoken, bcryptjs, nodemailer, pg, nodemon.
+- Base de données : PostgreSQL.
+- ORM : Prisma.
+- Styles : Tailwind CSS.
 
 ## Travail réalisé jusqu'à présent
 
@@ -41,39 +41,93 @@ L'objectif de ce projet est de proposer une interface permettant de construire u
 - Possibilité de mettre à jour un formulaire existant sans le recréer entièrement.
 - Ajout de la modification des champs et de l'adaptation de la structure du questionnaire pendant le développement.
 
+## Architecture technique
+
+### Frontend
+Le frontend a été réalisé avec Next.js. Les pages principales incluent l'accueil, la connexion, l'inscription, la récupération du mot de passe et la réinitialisation du mot de passe. Les composants et la structure des pages permettent d'afficher une interface simple et fluide pour l'utilisateur.
+
+### Backend
+Le backend a été réalisé avec Express.js. Il contient les routes, les contrôleurs, les middlewares et les fichiers utilitaires nécessaires pour organiser la logique du serveur. L'architecture a été pensée de manière modulaire afin de garder un code clair et maintenable.
+
+### Base de données
+La base de données est gérée avec Prisma et PostgreSQL. Prisma permet de définir les modèles, de générer le client de base de données et de gérer les migrations.
+
 ## Comment utiliser le projet sur un PC
+
+### Prérequis
+Avant d'utiliser le projet, il faut installer :
+- Git
+- Node.js
+- npm
+- PostgreSQL
+- Prisma CLI
 
 ### 1. Cloner le projet
 ```bash
 git clone https://github.com/HasnaAmal/enquete.git
 ```
 
-### 2. Accéder au dossier du projet
+### 2. Ouvrir le dossier du projet
 ```bash
 cd enquete
 ```
 
-### 3. Accéder au dossier frontend
+### 3. Installer et lancer le backend
+Ouvrir un terminal dans le dossier backend puis installer les dépendances :
 ```bash
-cd frontend
-```
-
-### 4. Installer les dépendances
-```bash
+cd backend
 npm install
 ```
 
-### 5. Configurer la base de données
-- Vérifier que le fichier `.env` contient la variable `DATABASE_URL`.
-- Vérifier que Prisma est bien configuré dans le projet.
-- Lancer les migrations Prisma si nécessaire.
+Les dépendances backend utilisées peuvent inclure :
+- express
+- prisma
+- @prisma/client
+- dotenv
+- cors
+- cookie-parser
+- jsonwebtoken
+- bcryptjs
+- nodemailer
+- pg
+- nodemon
 
-### 6. Lancer le projet en local
+Créer le fichier `.env` si nécessaire, puis ajouter la configuration de la base de données :
+```env
+DATABASE_URL="your_database_url"
+```
+
+Ensuite, exécuter Prisma :
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+Puis lancer le backend :
 ```bash
 npm run dev
 ```
 
-Puis ouvrir l'adresse affichée dans le terminal, souvent :
+### 4. Installer et lancer le frontend
+Ouvrir un autre terminal dans le dossier frontend puis installer les dépendances :
+```bash
+cd frontend
+npm install
+```
+
+Les dépendances frontend utilisées peuvent inclure :
+- next
+- react
+- react-dom
+- tailwindcss
+
+Puis lancer le frontend :
+```bash
+npm run dev
+```
+
+### 5. Ouvrir l'application
+Ensuite, ouvrir l'adresse affichée dans le terminal, généralement :
 ```bash
 http://localhost:3000
 ```
@@ -88,3 +142,7 @@ http://localhost:3000
 - Connecter le frontend à la base de données via Prisma.
 - Ajouter une gestion d'administration ou une authentification si nécessaire.
 - Améliorer davantage l'interface et l'expérience utilisateur.
+
+## Dépôt GitHub
+
+Le nom du dépôt GitHub utilisé pour ce projet est `enquete`.
