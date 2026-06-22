@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Form {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  status      FormStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  questions   Question[]
+  responses   Response[]
+}
+
+model Question {
+  id       String       @id @default(cuid())
+  formId   String
+  order    Int
+  text     String
+  type     QuestionType
+  required Boolean      @default(false)
+  options  String[]
+
+  form     Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers  Answer[]
+}
+
+model Response {
+  id        String   @id @default(cuid())
+  formId    String
+  createdAt DateTime @default(now())
+
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers   Answer[]
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  responseId String
+  questionId String
+  value      String
+
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+enum FormStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum QuestionType {
+  SHORT
+  LONG
+  RADIO
+  CHECKBOX
+  SELECT
+  RATING
+}
