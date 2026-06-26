@@ -131,18 +131,3 @@ Ensuite, ouvrir l'adresse affichée dans le terminal, généralement :
 ```bash
 http://localhost:3000
 ```
-
-## État actuel du projet
-
-À ce stade, le projet permet déjà de préparer et de gérer un formulaire d'enquête jusqu'à l'étape de modification. La structure principale du frontend est en place, et l'application a évolué depuis l'initialisation jusqu'à la gestion de formulaires modifiables.
-
-## Prochaines étapes
-- Améliorer la validation des champs du formulaire.
-- Ajouter la soumission et le stockage des réponses.
-- Connecter le frontend à la base de données via Prisma.
-- Ajouter une gestion d'administration ou une authentification si nécessaire.
-- Améliorer davantage l'interface et l'expérience utilisateur.
-
-## Dépôt GitHub
-
-Le nom du dépôt GitHub utilisé pour ce projet est `enquete`.
