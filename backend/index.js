@@ -6,7 +6,7 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'https://tourmaline-tarsier-97df31.netlify.app/' }));
 app.use(express.json());
 app.use('/api', routes);
 app.use(errorHandler);
