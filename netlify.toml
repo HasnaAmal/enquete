@@ -1,5 +1,10 @@
 [build]
-  command = "echo Building Functions"
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 [functions]
   directory = "server/functions"
@@ -7,7 +12,7 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  force = true
   from = "/api/*"
-  status = 200
   to = "/.netlify/functions/app/:splat"
+  status = 200
+  force = true
