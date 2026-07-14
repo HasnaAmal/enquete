@@ -12,16 +12,22 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  if (Buffer.isBuffer(req.body)) {
+  const methodsWithBody = ['POST', 'PUT', 'PATCH'];
+
+  if (!methodsWithBody.includes(req.method)) {
+    return next();
+  }
+
+  if (Buffer.isBuffer(req.body) && req.body.length > 0) {
     try {
       req.body = JSON.parse(req.body.toString('utf8'));
     } catch {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
+
   next();
 });
-
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Backend is working' });
 });
