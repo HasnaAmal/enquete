@@ -6,11 +6,7 @@ import errorHandler from './middleware/errorHandler.mjs';
 
 const app = express();
 
-app.use(
-  cors({
-    origin: 'https://tourmaline-tarsier-97df31.netlify.app'
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 
