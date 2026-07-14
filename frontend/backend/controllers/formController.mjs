@@ -38,13 +38,19 @@ export const getFormById = async (req, res, next) => {
 
 export const createForm = async (req, res, next) => {
   try {
-    console.log('content-type:', req.headers['content-type']);
-    console.log('req.body:', req.body);
+    console.log('createForm req.body:', req.body);
 
-    const { title, description } = req.body || {};
+    const title = req.body?.title;
+    const description = req.body?.description;
 
     if (!title || !String(title).trim()) {
-      return res.status(400).json({ error: 'Title is required' });
+      return res.status(400).json({
+        error: 'Title is required',
+        debug: {
+          body: req.body,
+          contentType: req.headers['content-type'] || null
+        }
+      });
     }
 
     const form = await prisma.form.create({
@@ -54,7 +60,7 @@ export const createForm = async (req, res, next) => {
       }
     });
 
-    res.status(201).json(form);
+    return res.status(201).json(form);
   } catch (err) {
     next(err);
   }
