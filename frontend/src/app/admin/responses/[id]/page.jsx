@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 
-export default function ResponsesPage({ params }) {
+export default function ResponsesPage() {
+  const params = useParams();
   const id = params?.id;
 
   const [form, setForm] = useState(null);
@@ -12,31 +14,19 @@ export default function ResponsesPage({ params }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!id) {
-      setError('Missing form id.');
-      setLoading(false);
-      return;
-    }
+    if (!id) return;
 
     let mounted = true;
 
     (async () => {
       try {
-        console.log('Loading form:', id);
         const formData = await api.getForm(id);
-        console.log('Form loaded:', formData);
+        const responsesData = await api.getResponses(id);
 
         if (!mounted) return;
         setForm(formData);
-
-        console.log('Loading responses:', id);
-        const responsesData = await api.getResponses(id);
-        console.log('Responses loaded:', responsesData);
-
-        if (!mounted) return;
         setResponses(Array.isArray(responsesData) ? responsesData : []);
       } catch (err) {
-        console.error('Responses page load error:', err);
         if (mounted) setError('Could not load responses.');
       } finally {
         if (mounted) setLoading(false);
