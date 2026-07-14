@@ -38,14 +38,20 @@ export const getFormById = async (req, res, next) => {
 
 export const createForm = async (req, res, next) => {
   try {
-    const { title, description } = req.body;
+    console.log('content-type:', req.headers['content-type']);
+    console.log('req.body:', req.body);
 
-    if (!title) {
+    const { title, description } = req.body || {};
+
+    if (!title || !String(title).trim()) {
       return res.status(400).json({ error: 'Title is required' });
     }
 
     const form = await prisma.form.create({
-      data: { title, description }
+      data: {
+        title: String(title).trim(),
+        description: description ? String(description).trim() : ''
+      }
     });
 
     res.status(201).json(form);
@@ -56,13 +62,13 @@ export const createForm = async (req, res, next) => {
 
 export const updateForm = async (req, res, next) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status } = req.body || {};
 
     const form = await prisma.form.update({
       where: { id: req.params.id },
       data: {
-        ...(title && { title }),
-        ...(description !== undefined && { description }),
+        ...(title !== undefined && { title: String(title).trim() }),
+        ...(description !== undefined && { description: String(description).trim() }),
         ...(status && { status })
       }
     });
