@@ -1,15 +1,69 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
-export default async function ResponsesPage({ params }) {
-  const { id } = await params;
+export default function ResponsesPage({ params }) {
+  const id = params?.id;
 
-  let form = null;
-  let responses = [];
+  const [form, setForm] = useState(null);
+  const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  try {
-    form = await api.getForm(id);
-    responses = await api.getResponses(id);
-  } catch {
+  useEffect(() => {
+    if (!id) return;
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        const [formData, responsesData] = await Promise.all([
+          api.getForm(id),
+          api.getResponses(id),
+        ]);
+
+        if (!mounted) return;
+
+        setForm(formData);
+        setResponses(Array.isArray(responsesData) ? responsesData : []);
+      } catch {
+        if (mounted) {
+          setError('Could not load responses.');
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#f7f6f2', padding: '2rem' }}>
+        <div
+          style={{
+            maxWidth: '900px',
+            margin: '0 auto',
+            background: '#fff',
+            border: '1px solid #e5e5e0',
+            borderRadius: '12px',
+            padding: '2rem',
+            color: '#666',
+          }}
+        >
+          Loading responses...
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !form) {
     return (
       <div style={{ minHeight: '100vh', background: '#f7f6f2', padding: '2rem' }}>
         <div
