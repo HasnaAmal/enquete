@@ -1,21 +1,50 @@
-import { prisma } from '@/lib/prisma.mjs';
+'use client';
 
-export default async function AdminFormsPage() {
-  let forms = [];
+import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 
-  try {
-    forms = await prisma.form.findMany({
-      include: {
-        _count: {
-          select: { questions: true, responses: true }
+export default function AdminFormsPage() {
+  const [forms, setForms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const data = await api.getForms();
+        if (mounted) {
+          setForms(Array.isArray(data) ? data : []);
         }
-      },
-      orderBy: { updatedAt: 'desc' }
-    });
-  } catch {
+      } catch (err) {
+        if (mounted) {
+          setError('Could not load forms.');
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
     return (
       <div style={{ padding: '2rem', color: '#666' }}>
-        Could not load forms.
+        Loading forms...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '2rem', color: '#666' }}>
+        {error}
       </div>
     );
   }
