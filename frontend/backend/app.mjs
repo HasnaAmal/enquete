@@ -8,8 +8,15 @@ const app = express();
 
 app.use(cors());
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  console.log('method:', req.method);
+  console.log('url:', req.originalUrl);
+  console.log('content-type:', req.headers['content-type']);
+  next();
+});
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Backend is working' });
