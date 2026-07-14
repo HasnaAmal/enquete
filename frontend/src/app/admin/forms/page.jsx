@@ -1,10 +1,17 @@
-import { api } from '@/lib/api';
+import { prisma } from '@/backend/lib/prisma.mjs';
 
 export default async function AdminFormsPage() {
   let forms = [];
 
   try {
-    forms = await api.getForms();
+    forms = await prisma.form.findMany({
+      include: {
+        _count: {
+          select: { questions: true, responses: true }
+        }
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
   } catch {
     return (
       <div style={{ padding: '2rem', color: '#666' }}>
@@ -143,22 +150,15 @@ export default async function AdminFormsPage() {
                     Open public form
                   </a>
 
-                  <a
-                    href={`/admin/responses/${form.id}`}
-                    style={linkBtnSecondary}
-                  >
+                  <a href={`/admin/responses/${form.id}`} style={linkBtnSecondary}>
                     View responses
                   </a>
-                  <a
-  href={`/admin/edit/${form.id}`}
-  style={linkBtnSecondary}
->
-  Edit form
-</a>
-                  <a
-                    href="/admin"
-                    style={linkBtnSecondary}
-                  >
+
+                  <a href={`/admin/edit/${form.id}`} style={linkBtnSecondary}>
+                    Edit form
+                  </a>
+
+                  <a href="/admin" style={linkBtnSecondary}>
                     Create another form
                   </a>
                 </div>
