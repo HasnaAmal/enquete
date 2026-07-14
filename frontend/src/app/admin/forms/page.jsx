@@ -1,4 +1,4 @@
-import { prisma } from '@/backend/lib/prisma.mjs';
+import { prisma } from '@/lib/prisma.mjs';
 
 export default async function AdminFormsPage() {
   let forms = [];
