@@ -6,18 +6,20 @@ import errorHandler from './middleware/errorHandler.mjs';
 
 const app = express();
 
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
+app.use(cors());
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Backend is working' });
 });
 
 app.use('/api', routes);
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
 app.use(errorHandler);
 
