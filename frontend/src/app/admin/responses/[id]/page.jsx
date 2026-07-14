@@ -12,29 +12,34 @@ export default function ResponsesPage({ params }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setError('Missing form id.');
+      setLoading(false);
+      return;
+    }
 
     let mounted = true;
 
     (async () => {
       try {
-        const [formData, responsesData] = await Promise.all([
-          api.getForm(id),
-          api.getResponses(id),
-        ]);
+        console.log('Loading form:', id);
+        const formData = await api.getForm(id);
+        console.log('Form loaded:', formData);
 
         if (!mounted) return;
-
         setForm(formData);
+
+        console.log('Loading responses:', id);
+        const responsesData = await api.getResponses(id);
+        console.log('Responses loaded:', responsesData);
+
+        if (!mounted) return;
         setResponses(Array.isArray(responsesData) ? responsesData : []);
-      } catch {
-        if (mounted) {
-          setError('Could not load responses.');
-        }
+      } catch (err) {
+        console.error('Responses page load error:', err);
+        if (mounted) setError('Could not load responses.');
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     })();
 
@@ -77,7 +82,7 @@ export default function ResponsesPage({ params }) {
             color: '#666',
           }}
         >
-          Could not load responses.
+          {error || 'Could not load responses.'}
         </div>
       </div>
     );
