@@ -61,9 +61,8 @@ export default function RegisterPage() {
       });
 
       setTimeout(() => {
-        router.push('/');
-        router.refresh();
-      }, 1200);
+  router.push('/admin/login');
+}, 1200);
     } catch (err) {
       setError(err?.response?.data?.message || 'Registration failed.');
     } finally {
