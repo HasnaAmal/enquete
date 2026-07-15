@@ -7,6 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  forms     Form[]
+}
+
 model Form {
   id          String     @id @default(cuid())
   title       String
@@ -14,7 +26,9 @@ model Form {
   status      FormStatus @default(DRAFT)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  userId      String
 
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   questions   Question[]
   responses   Response[]
 }
@@ -49,6 +63,11 @@ model Answer {
 
   response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
   question   Question @relation(fields: [questionId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 enum FormStatus {
