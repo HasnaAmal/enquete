@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const client = axios.create({
   baseURL: '/api',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -19,4 +20,11 @@ export const api = {
     client.post(`/forms/${formId}/responses`, { answers }).then(r => r.data),
   getResponses: (formId) =>
     client.get(`/forms/${formId}/responses`).then(r => r.data),
+
+  adminLogin: (email, password) =>
+    client.post('/admin/login', { email, password }).then(r => r.data),
+  adminLogout: () =>
+    client.post('/admin/logout').then(r => r.data),
+  adminMe: () =>
+    client.get('/admin/me').then(r => r.data),
 };
