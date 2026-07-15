@@ -1,4 +1,5 @@
 import ToasterProvider from '@/components/ToasterProvider';
+import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
 
 export const metadata = {
@@ -10,8 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {children}
-        <ToasterProvider />
+        <AuthProvider>
+          {children}
+          <ToasterProvider />
+        </AuthProvider>
       </body>
     </html>
   );
