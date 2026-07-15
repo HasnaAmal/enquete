@@ -6,6 +6,14 @@ export const getForms = async (req, res, next) => {
       include: {
         _count: {
           select: { questions: true, responses: true }
+        },
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true
+          }
         }
       },
       orderBy: { updatedAt: 'desc' }
@@ -22,7 +30,15 @@ export const getFormById = async (req, res, next) => {
     const form = await prisma.form.findUnique({
       where: { id: req.params.id },
       include: {
-        questions: { orderBy: { order: 'asc' } }
+        questions: { orderBy: { order: 'asc' } },
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true
+          }
+        }
       }
     });
 
@@ -39,9 +55,14 @@ export const getFormById = async (req, res, next) => {
 export const createForm = async (req, res, next) => {
   try {
     console.log('createForm req.body:', req.body);
+    console.log('createForm req.user:', req.user);
 
     const title = req.body?.title;
     const description = req.body?.description;
+
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
 
     if (!title || !String(title).trim()) {
       return res.status(400).json({
@@ -56,7 +77,8 @@ export const createForm = async (req, res, next) => {
     const form = await prisma.form.create({
       data: {
         title: String(title).trim(),
-        description: description ? String(description).trim() : ''
+        description: description ? String(description).trim() : '',
+        userId: req.user.id
       }
     });
 
@@ -69,6 +91,21 @@ export const createForm = async (req, res, next) => {
 export const updateForm = async (req, res, next) => {
   try {
     const { title, description, status } = req.body || {};
+
+    const existingForm = await prisma.form.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!existingForm) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+
+    const isOwner = existingForm.userId === req.user?.id;
+    const isAdmin = req.user?.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Not authorized to update this form' });
+    }
 
     const form = await prisma.form.update({
       where: { id: req.params.id },
@@ -87,6 +124,21 @@ export const updateForm = async (req, res, next) => {
 
 export const deleteForm = async (req, res, next) => {
   try {
+    const existingForm = await prisma.form.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!existingForm) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+
+    const isOwner = existingForm.userId === req.user?.id;
+    const isAdmin = req.user?.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Not authorized to delete this form' });
+    }
+
     await prisma.form.delete({
       where: { id: req.params.id }
     });
