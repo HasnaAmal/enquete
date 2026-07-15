@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 
 export default function AdminLoginPage() {
@@ -17,11 +18,17 @@ export default function AdminLoginPage() {
     setError('');
 
     try {
-      await api.adminLogin(email, password);
-      router.push('/admin/forms');
+      const data = await api.login(email, password);
+
+      if (data?.user?.role === 'ADMIN') {
+        router.push('/admin/forms');
+      } else {
+        router.push('/');
+      }
+
       router.refresh();
     } catch (err) {
-      setError(err?.response?.data?.error || 'Login failed. Check your credentials.');
+      setError(err?.response?.data?.message || 'Login failed. Check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -33,32 +40,58 @@ export default function AdminLoginPage() {
         minHeight: '100vh',
         display: 'grid',
         placeItems: 'center',
-        background: '#f7f6f2',
+        background: '#FDFAF7',
         padding: '2rem',
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: '460px',
           background: '#fff',
-          border: '1px solid #e5e5e0',
-          borderRadius: '16px',
-          padding: '2rem',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+          border: '1px solid #ead8db',
+          borderRadius: '24px',
+          padding: '2.2rem',
+          boxShadow: '0 20px 50px rgba(200,125,135,0.10)',
         }}
       >
-        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', color: '#28251d' }}>
-          Admin login
+        <p
+          style={{
+            fontSize: '0.78rem',
+            letterSpacing: '0.28em',
+            textTransform: 'uppercase',
+            color: '#C87D87',
+            marginBottom: '0.75rem',
+          }}
+        >
+          Inora
+        </p>
+
+        <h1
+          style={{
+            fontSize: '2rem',
+            marginBottom: '0.55rem',
+            color: '#3B2C34',
+          }}
+        >
+          Sign in
         </h1>
 
-        <p style={{ color: '#7a7974', marginBottom: '1.5rem' }}>
-          Sign in to create forms and view responses.
+        <p style={{ color: '#7a6670', marginBottom: '1.5rem', lineHeight: 1.7 }}>
+          Sign in to access your account. Admins will be directed to the admin space automatically.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
           <div>
-            <label htmlFor="email" style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 500 }}>
+            <label
+              htmlFor="email"
+              style={{
+                display: 'block',
+                marginBottom: '0.45rem',
+                fontWeight: 500,
+                color: '#4b3a42',
+              }}
+            >
               Email
             </label>
             <input
@@ -70,16 +103,26 @@ export default function AdminLoginPage() {
               autoComplete="email"
               style={{
                 width: '100%',
-                padding: '0.8rem 0.9rem',
-                border: '1px solid #d4d1ca',
-                borderRadius: '10px',
-                background: '#fafaf8',
+                padding: '0.9rem 1rem',
+                border: '1px solid #e6d7da',
+                borderRadius: '14px',
+                background: '#fffdfc',
+                color: '#3B2C34',
+                outline: 'none',
               }}
             />
           </div>
 
           <div>
-            <label htmlFor="password" style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 500 }}>
+            <label
+              htmlFor="password"
+              style={{
+                display: 'block',
+                marginBottom: '0.45rem',
+                fontWeight: 500,
+                color: '#4b3a42',
+              }}
+            >
               Password
             </label>
             <input
@@ -91,10 +134,12 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
               style={{
                 width: '100%',
-                padding: '0.8rem 0.9rem',
-                border: '1px solid #d4d1ca',
-                borderRadius: '10px',
-                background: '#fafaf8',
+                padding: '0.9rem 1rem',
+                border: '1px solid #e6d7da',
+                borderRadius: '14px',
+                background: '#fffdfc',
+                color: '#3B2C34',
+                outline: 'none',
               }}
             />
           </div>
@@ -105,9 +150,9 @@ export default function AdminLoginPage() {
                 background: '#fff1f1',
                 color: '#b42318',
                 border: '1px solid #f3c7c7',
-                borderRadius: '10px',
-                padding: '0.75rem 0.9rem',
-                fontSize: '0.9rem',
+                borderRadius: '14px',
+                padding: '0.8rem 0.95rem',
+                fontSize: '0.92rem',
               }}
             >
               {error}
@@ -118,11 +163,11 @@ export default function AdminLoginPage() {
             type="submit"
             disabled={loading}
             style={{
-              background: '#01696f',
+              background: '#C87D87',
               color: '#fff',
               border: 'none',
-              borderRadius: '10px',
-              padding: '0.85rem 1rem',
+              borderRadius: '14px',
+              padding: '0.95rem 1rem',
               fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.7 : 1,
@@ -131,6 +176,13 @@ export default function AdminLoginPage() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
+
+        <p style={{ marginTop: '1.25rem', color: '#7a6670', fontSize: '0.95rem' }}>
+          Don&apos;t have an account?{' '}
+          <Link href="/register" style={{ color: '#6B7556', fontWeight: 600, textDecoration: 'none' }}>
+            Create one
+          </Link>
+        </p>
       </div>
     </div>
   );
