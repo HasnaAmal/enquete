@@ -12,9 +12,16 @@ export function AuthProvider({ children }) {
   const fetchMe = async () => {
     try {
       const data = await api.me();
-      setUser(data?.user || null);
-      return data?.user || null;
-    } catch {
+      const currentUser = data?.user || null;
+      setUser(currentUser);
+      return currentUser;
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        setUser(null);
+        return null;
+      }
+
+      console.error('Failed to fetch current user:', err);
       setUser(null);
       return null;
     } finally {
@@ -34,7 +41,6 @@ export function AuthProvider({ children }) {
 
   const register = async (fullName, email, password) => {
     const data = await api.register(fullName, email, password);
-    setUser(data?.user || null);
     return data;
   };
 
