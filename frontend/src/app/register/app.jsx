@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || '/.netlify/functions/api';
+import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { register } = useAuth();
 
   const [form, setForm] = useState({
     fullName: '',
@@ -51,25 +50,7 @@ export default function RegisterPage() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          password: form.password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data?.message || 'Registration failed.');
-        return;
-      }
+      await register(form.fullName, form.email, form.password);
 
       setSuccess('Account created successfully.');
       setForm({
@@ -81,9 +62,10 @@ export default function RegisterPage() {
 
       setTimeout(() => {
         router.push('/');
+        router.refresh();
       }, 1200);
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err?.response?.data?.message || 'Registration failed.');
     } finally {
       setLoading(false);
     }
@@ -206,7 +188,7 @@ export default function RegisterPage() {
 
               <p className="mt-6 text-sm text-[#7A6670]">
                 Already have an account?{' '}
-                <Link href="/login" className="font-medium text-[#6B7556] hover:underline">
+                <Link href="/admin/login" className="font-medium text-[#6B7556] hover:underline">
                   Log in
                 </Link>
               </p>
