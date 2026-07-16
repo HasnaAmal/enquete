@@ -5,12 +5,27 @@ export const saveQuestions = async (req, res, next) => {
     const formId = req.params.formId;
     const { questions } = req.body;
 
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
     if (!formId || typeof formId !== 'string') {
       return res.status(400).json({ error: 'Invalid formId' });
     }
 
     if (!Array.isArray(questions)) {
       return res.status(400).json({ error: 'questions must be an array' });
+    }
+
+    const form = await prisma.form.findFirst({
+      where: {
+        id: formId,
+        userId: req.user.id
+      }
+    });
+
+    if (!form) {
+      return res.status(404).json({ error: 'Form not found' });
     }
 
     const responseCount = await prisma.response.count({
@@ -35,7 +50,7 @@ export const saveQuestions = async (req, res, next) => {
           formId,
           order: i,
           text: q.text,
-          type: q.type.toUpperCase(),
+          type: String(q.type).toUpperCase(),
           required: q.required ?? false,
           options: q.options ?? []
         }
