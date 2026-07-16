@@ -34,6 +34,18 @@ export default function AdminFormsPage() {
     };
   }, []);
 
+  const handleDelete = async (form) => {
+    const confirmed = window.confirm(`Delete "${form.title}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await api.deleteForm(form.id);
+      setForms((prev) => prev.filter((item) => item.id !== form.id));
+    } catch {
+      window.alert('Could not delete form.');
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#f7f6f2' }}>
       <header
@@ -194,9 +206,13 @@ export default function AdminFormsPage() {
                     Edit form
                   </Link>
 
-                  <Link href="/admin" style={linkBtnSecondary}>
-                    Create another form
-                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(form)}
+                    style={linkBtnDanger}
+                  >
+                    Delete form
+                  </button>
                 </div>
               </div>
             ))}
@@ -242,4 +258,18 @@ const linkBtnSecondary = {
   fontWeight: 500,
   fontSize: '0.875rem',
   textDecoration: 'none',
+};
+
+const linkBtnDanger = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.375rem',
+  background: '#fff5f5',
+  color: '#c53030',
+  border: '1px solid #fed7d7',
+  borderRadius: '8px',
+  padding: '0.6rem 1rem',
+  fontWeight: 500,
+  fontSize: '0.875rem',
+  cursor: 'pointer',
 };
