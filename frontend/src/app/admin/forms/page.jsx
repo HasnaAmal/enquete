@@ -8,6 +8,9 @@ export default function AdminFormsPage() {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     let mounted = true;
@@ -34,15 +37,31 @@ export default function AdminFormsPage() {
     };
   }, []);
 
-  const handleDelete = async (form) => {
-    const confirmed = window.confirm(`Delete "${form.title}"? This cannot be undone.`);
-    if (!confirmed) return;
+  const openDeleteModal = (form) => {
+    setDeleteError('');
+    setDeleteTarget(form);
+  };
+
+  const closeDeleteModal = () => {
+    if (deleting) return;
+    setDeleteError('');
+    setDeleteTarget(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setDeleting(true);
+    setDeleteError('');
 
     try {
-      await api.deleteForm(form.id);
-      setForms((prev) => prev.filter((item) => item.id !== form.id));
+      await api.deleteForm(deleteTarget.id);
+      setForms((prev) => prev.filter((item) => item.id !== deleteTarget.id));
+      setDeleteTarget(null);
     } catch {
-      window.alert('Could not delete form.');
+      setDeleteError('Could not delete form. Please try again.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -208,7 +227,7 @@ export default function AdminFormsPage() {
 
                   <button
                     type="button"
-                    onClick={() => handleDelete(form)}
+                    onClick={() => openDeleteModal(form)}
                     style={linkBtnDanger}
                   >
                     Delete form
@@ -219,6 +238,94 @@ export default function AdminFormsPage() {
           </div>
         )}
       </div>
+
+      {deleteTarget ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-form-title"
+          style={modalOverlay}
+          onClick={closeDeleteModal}
+        >
+          <div
+            style={modalCard}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '999px',
+                background: '#fff1f1',
+                color: '#c53030',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem',
+                marginBottom: '1rem',
+              }}
+            >
+              !
+            </div>
+
+            <h2
+              id="delete-form-title"
+              style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                color: '#28251d',
+                marginBottom: '0.5rem',
+              }}
+            >
+              Delete this form?
+            </h2>
+
+            <p style={{ color: '#7a7974', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+              <strong style={{ color: '#28251d' }}>{deleteTarget.title}</strong> will be permanently deleted.
+            </p>
+
+            <p style={{ color: '#7a7974', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+              This action cannot be undone and will remove the form, its questions, and related responses.
+            </p>
+
+            {deleteError ? (
+              <div
+                style={{
+                  background: '#fff5f5',
+                  color: '#c53030',
+                  border: '1px solid #fed7d7',
+                  borderRadius: '10px',
+                  padding: '0.8rem 0.9rem',
+                  marginBottom: '1rem',
+                  fontSize: '0.9rem',
+                }}
+              >
+                {deleteError}
+              </div>
+            ) : null}
+
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={closeDeleteModal}
+                disabled={deleting}
+                style={modalCancelBtn}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deleting}
+                style={modalDeleteBtn}
+              >
+                {deleting ? 'Deleting...' : 'Delete form'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -271,5 +378,54 @@ const linkBtnDanger = {
   padding: '0.6rem 1rem',
   fontWeight: 500,
   fontSize: '0.875rem',
+  cursor: 'pointer',
+};
+
+const modalOverlay = {
+  position: 'fixed',
+  inset: 0,
+  background: 'rgba(40, 37, 29, 0.42)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '1rem',
+  zIndex: 100,
+};
+
+const modalCard = {
+  width: '100%',
+  maxWidth: '520px',
+  background: '#fff',
+  border: '1px solid #e5e5e0',
+  borderRadius: '16px',
+  padding: '1.5rem',
+  boxShadow: '0 24px 60px rgba(0,0,0,0.18)',
+};
+
+const modalCancelBtn = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: '#f3f0ec',
+  color: '#28251d',
+  border: '1px solid #d4d1ca',
+  borderRadius: '10px',
+  padding: '0.75rem 1rem',
+  fontWeight: 600,
+  fontSize: '0.9rem',
+  cursor: 'pointer',
+};
+
+const modalDeleteBtn = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: '#c53030',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '10px',
+  padding: '0.75rem 1rem',
+  fontWeight: 600,
+  fontSize: '0.9rem',
   cursor: 'pointer',
 };
