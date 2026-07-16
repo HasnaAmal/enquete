@@ -2,18 +2,15 @@ import { prisma } from '../lib/prisma.mjs';
 
 export const getForms = async (req, res, next) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
     const forms = await prisma.form.findMany({
+      where: { userId: req.user.id },
       include: {
         _count: {
           select: { questions: true, responses: true }
-        },
-        user: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true
-          }
         }
       },
       orderBy: { updatedAt: 'desc' }
@@ -27,18 +24,17 @@ export const getForms = async (req, res, next) => {
 
 export const getFormById = async (req, res, next) => {
   try {
-    const form = await prisma.form.findUnique({
-      where: { id: req.params.id },
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const form = await prisma.form.findFirst({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      },
       include: {
-        questions: { orderBy: { order: 'asc' } },
-        user: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true
-          }
-        }
+        questions: { orderBy: { order: 'asc' } }
       }
     });
 
@@ -54,9 +50,6 @@ export const getFormById = async (req, res, next) => {
 
 export const createForm = async (req, res, next) => {
   try {
-    console.log('createForm req.body:', req.body);
-    console.log('createForm req.user:', req.user);
-
     const title = req.body?.title;
     const description = req.body?.description;
 
@@ -66,11 +59,7 @@ export const createForm = async (req, res, next) => {
 
     if (!title || !String(title).trim()) {
       return res.status(400).json({
-        error: 'Title is required',
-        debug: {
-          body: req.body,
-          contentType: req.headers['content-type'] || null
-        }
+        error: 'Title is required'
       });
     }
 
@@ -90,21 +79,21 @@ export const createForm = async (req, res, next) => {
 
 export const updateForm = async (req, res, next) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
     const { title, description, status } = req.body || {};
 
-    const existingForm = await prisma.form.findUnique({
-      where: { id: req.params.id }
+    const existingForm = await prisma.form.findFirst({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      }
     });
 
     if (!existingForm) {
       return res.status(404).json({ error: 'Form not found' });
-    }
-
-    const isOwner = existingForm.userId === req.user?.id;
-    const isAdmin = req.user?.role === 'ADMIN';
-
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({ error: 'Not authorized to update this form' });
     }
 
     const form = await prisma.form.update({
@@ -124,19 +113,19 @@ export const updateForm = async (req, res, next) => {
 
 export const deleteForm = async (req, res, next) => {
   try {
-    const existingForm = await prisma.form.findUnique({
-      where: { id: req.params.id }
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const existingForm = await prisma.form.findFirst({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      }
     });
 
     if (!existingForm) {
       return res.status(404).json({ error: 'Form not found' });
-    }
-
-    const isOwner = existingForm.userId === req.user?.id;
-    const isAdmin = req.user?.role === 'ADMIN';
-
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({ error: 'Not authorized to delete this form' });
     }
 
     await prisma.form.delete({
