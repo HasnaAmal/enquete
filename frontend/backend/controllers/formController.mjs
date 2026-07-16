@@ -121,6 +121,14 @@ export const deleteForm = async (req, res, next) => {
       where: {
         id: req.params.id,
         userId: req.user.id
+      },
+      include: {
+        questions: {
+          select: { id: true }
+        },
+        responses: {
+          select: { id: true }
+        }
       }
     });
 
@@ -128,8 +136,40 @@ export const deleteForm = async (req, res, next) => {
       return res.status(404).json({ error: 'Form not found' });
     }
 
-    await prisma.form.delete({
-      where: { id: req.params.id }
+    const questionIds = existingForm.questions.map((q) => q.id);
+    const responseIds = existingForm.responses.map((r) => r.id);
+
+    await prisma.$transaction(async (tx) => {
+      if (questionIds.length || responseIds.length) {
+        await tx.answer.deleteMany({
+          where: {
+            OR: [
+              ...(questionIds.length ? [{ questionId: { in: questionIds } }] : []),
+              ...(responseIds.length ? [{ responseId: { in: responseIds } }] : [])
+            ]
+          }
+        });
+      }
+
+      if (responseIds.length) {
+        await tx.response.deleteMany({
+          where: {
+            id: { in: responseIds }
+          }
+        });
+      }
+
+      if (questionIds.length) {
+        await tx.question.deleteMany({
+          where: {
+            id: { in: questionIds }
+          }
+        });
+      }
+
+      await tx.form.delete({
+        where: { id: req.params.id }
+      });
     });
 
     res.json({ success: true });
