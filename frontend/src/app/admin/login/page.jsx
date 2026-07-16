@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
       const data = await login(email, password);
 
       if (data?.user?.role === 'ADMIN') {
-        router.push('/admin/forms');
+        router.push('/admin');
       } else {
         router.push('/');
       }
