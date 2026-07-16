@@ -14,7 +14,7 @@ const cookieOptions = {
 
 const signToken = (user) => {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user.id, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -32,8 +32,11 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedName = fullName.trim();
+
     const existingUser = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -44,15 +47,14 @@ export const register = async (req, res) => {
 
     const user = await prisma.user.create({
       data: {
-        fullName,
-        email: email.toLowerCase(),
+        fullName: normalizedName,
+        email: normalizedEmail,
         password: hashedPassword,
       },
       select: {
         id: true,
         fullName: true,
         email: true,
-        role: true,
         createdAt: true,
       },
     });
@@ -79,8 +81,10 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (!user) {
@@ -103,7 +107,6 @@ export const login = async (req, res) => {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
-        role: user.role,
       },
     });
   } catch (error) {
@@ -120,7 +123,6 @@ export const me = async (req, res) => {
         id: true,
         fullName: true,
         email: true,
-        role: true,
         createdAt: true,
       },
     });
