@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 
 export default function AdminFormsPage() {
@@ -17,7 +18,7 @@ export default function AdminFormsPage() {
         if (mounted) {
           setForms(Array.isArray(data) ? data : []);
         }
-      } catch (err) {
+      } catch {
         if (mounted) {
           setError('Could not load forms.');
         }
@@ -33,79 +34,85 @@ export default function AdminFormsPage() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{ padding: '2rem', color: '#666' }}>
-        Loading forms...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ padding: '2rem', color: '#666' }}>
-        {error}
-      </div>
-    );
-  }
-
   return (
     <div style={{ minHeight: '100vh', background: '#f7f6f2' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '1rem',
-            marginBottom: '1.5rem',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#28251d' }}>
-              All Forms
-            </h1>
-            <p style={{ color: '#7a7974', marginTop: '0.25rem' }}>
-              {forms.length} form{forms.length !== 1 ? 's' : ''} available
-            </p>
-          </div>
-
-          <a
-            href="/admin"
+      <header
+        style={{
+          background: '#fff',
+          borderBottom: '1px solid #e5e5e0',
+          padding: '0.875rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="3" y="3" width="22" height="22" rx="6" stroke="#01696f" strokeWidth="2" />
+            <line x1="8" y1="10" x2="20" y2="10" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="14" x2="17" y2="14" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="18" x2="13" y2="18" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="21" cy="18" r="3.5" fill="#01696f" />
+          </svg>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#28251d' }}>FormCraft</span>
+          <span
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.375rem',
-              background: '#01696f',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.65rem 1rem',
-              fontWeight: 500,
-              fontSize: '0.875rem',
-              textDecoration: 'none',
+              background: '#f3f0ec',
+              color: '#7a7974',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              padding: '2px 8px',
+              borderRadius: '4px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
             }}
           >
-            + Create New Form
-          </a>
+            Forms
+          </span>
         </div>
 
-        {!forms.length ? (
-          <div
-            style={{
-              background: '#fff',
-              border: '1px solid #e5e5e0',
-              borderRadius: '12px',
-              padding: '3rem',
-              textAlign: 'center',
-              color: '#aaa',
-            }}
-          >
+        <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
+          <Link href="/admin" style={linkBtnSecondary}>
+            Back to Builder
+          </Link>
+          <Link href="/admin" style={linkBtnPrimary}>
+            + Create New Form
+          </Link>
+        </div>
+      </header>
+
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#28251d' }}>All Forms</h1>
+          <p style={{ color: '#7a7974', marginTop: '0.25rem' }}>
+            {loading
+              ? 'Loading your forms...'
+              : error
+              ? error
+              : `${forms.length} form${forms.length !== 1 ? 's' : ''} available`}
+          </p>
+        </div>
+
+        {loading ? (
+          <div style={emptyCard}>
+            <p style={{ fontWeight: 500, color: '#7a7974' }}>Loading forms...</p>
+          </div>
+        ) : error ? (
+          <div style={emptyCard}>
+            <p style={{ fontWeight: 500, color: '#7a7974' }}>{error}</p>
+          </div>
+        ) : !forms.length ? (
+          <div style={emptyCard}>
             <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>📋</div>
             <p style={{ fontWeight: 500, color: '#7a7974' }}>No forms yet</p>
             <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
-              Create your first form from the admin builder.
+              Create your first form from the builder.
             </p>
           </div>
         ) : (
@@ -179,17 +186,17 @@ export default function AdminFormsPage() {
                     Open public form
                   </a>
 
-                  <a href={`/admin/responses/${form.id}`} style={linkBtnSecondary}>
+                  <Link href={`/admin/responses/${form.id}`} style={linkBtnSecondary}>
                     View responses
-                  </a>
+                  </Link>
 
-                  <a href={`/admin/edit/${form.id}`} style={linkBtnSecondary}>
+                  <Link href={`/admin/edit/${form.id}`} style={linkBtnSecondary}>
                     Edit form
-                  </a>
+                  </Link>
 
-                  <a href="/admin" style={linkBtnSecondary}>
+                  <Link href="/admin" style={linkBtnSecondary}>
                     Create another form
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -199,6 +206,16 @@ export default function AdminFormsPage() {
     </div>
   );
 }
+
+const emptyCard = {
+  background: '#fff',
+  border: '1px solid #e5e5e0',
+  borderRadius: '12px',
+  padding: '3rem',
+  textAlign: 'center',
+  color: '#aaa',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+};
 
 const linkBtnPrimary = {
   display: 'inline-flex',
