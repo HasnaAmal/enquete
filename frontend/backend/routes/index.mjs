@@ -11,12 +11,12 @@ import {
   submitResponse,
   getResponses
 } from '../controllers/responseController.mjs';
-import { protect, requireAdmin } from '../middleware/auth.js';
+import { protect } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/forms', getForms);
-router.get('/forms/:id', getFormById);
+router.get('/forms', protect, getForms);
+router.get('/forms/:id', protect, getFormById);
 
 router.post('/forms', protect, createForm);
 router.put('/forms/:id', protect, updateForm);
