@@ -41,6 +41,7 @@ export function AuthProvider({ children }) {
 
   const register = async (fullName, email, password) => {
     const data = await api.register(fullName, email, password);
+    setUser(data?.user || null);
     return data;
   };
 
@@ -67,7 +68,6 @@ export function AuthProvider({ children }) {
       logout,
       refreshUser,
       isAuthenticated: !!user,
-      isAdmin: user?.role === 'ADMIN',
     }),
     [user, loading]
   );
