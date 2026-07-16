@@ -53,6 +53,7 @@ export default function RegisterPage() {
       await register(form.fullName, form.email, form.password);
 
       setSuccess('Account created successfully.');
+
       setForm({
         fullName: '',
         email: '',
@@ -61,8 +62,9 @@ export default function RegisterPage() {
       });
 
       setTimeout(() => {
-  router.push('/admin/login');
-}, 1200);
+        router.push('/admin');
+        router.refresh();
+      }, 800);
     } catch (err) {
       setError(err?.response?.data?.message || 'Registration failed.');
     } finally {
@@ -71,130 +73,399 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFAF7] px-6 py-12 text-[#3B2C34]">
-      <div className="mx-auto flex min-h-[80vh] max-w-6xl items-center justify-center">
-        <div className="grid w-full overflow-hidden rounded-[32px] border border-[#E5D6D9] bg-white shadow-[0_20px_60px_rgba(200,125,135,0.12)] lg:grid-cols-2">
-          <div className="hidden flex-col justify-between bg-gradient-to-br from-[#FBEAD6] via-[#FDF6F3] to-[#F0C4CB] p-10 lg:flex">
-            <div>
-              <p className="mb-3 text-sm uppercase tracking-[0.35em] text-[#C87D87]">
-                Inora
-              </p>
-              <h1 className="font-serif text-5xl leading-tight text-[#3B2C34]">
-                Create an account and start building your forms beautifully.
-              </h1>
-              <p className="mt-6 max-w-md text-base leading-7 text-[#6E5A63]">
-                Register once, create forms with your own account, and manage everything from your personal workspace.
-              </p>
-            </div>
+    <div style={{ minHeight: '100vh', background: '#f7f6f2' }}>
+      <header
+        style={{
+          background: '#fff',
+          borderBottom: '1px solid #e5e5e0',
+          padding: '0.875rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="3" y="3" width="22" height="22" rx="6" stroke="#01696f" strokeWidth="2" />
+            <line x1="8" y1="10" x2="20" y2="10" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="14" x2="17" y2="14" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="18" x2="13" y2="18" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="21" cy="18" r="3.5" fill="#01696f" />
+          </svg>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#28251d' }}>FormCraft</span>
+        </div>
 
-            <div className="rounded-[28px] border border-white/60 bg-white/70 p-6 backdrop-blur-sm">
-              <div className="mb-4 h-2 w-20 rounded-full bg-[#C87D87]" />
-              <p className="text-sm leading-7 text-[#5E4A53]">
-                Elegant, secure, and simple — each form belongs to the account that created it.
-              </p>
-            </div>
+        <Link
+          href="/admin/login"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: '#f3f0ec',
+            color: '#28251d',
+            border: '1px solid #d4d1ca',
+            borderRadius: '8px',
+            padding: '0.625rem 1rem',
+            fontWeight: 500,
+            fontSize: '0.875rem',
+            textDecoration: 'none',
+          }}
+        >
+          Sign in
+        </Link>
+      </header>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.05fr) 420px',
+          maxWidth: '1120px',
+          margin: '0 auto',
+          padding: '2rem',
+          gap: '2rem',
+          alignItems: 'center',
+          minHeight: 'calc(100vh - 72px)',
+        }}
+      >
+        <section>
+          <div style={{ marginBottom: '1rem' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                padding: '3px 10px',
+                borderRadius: '99px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                background: '#e6f2f2',
+                color: '#01696f',
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: 'currentColor',
+                  display: 'inline-block',
+                }}
+              />
+              Create your workspace
+            </span>
           </div>
 
-          <div className="flex items-center justify-center px-6 py-10 sm:px-10">
-            <div className="w-full max-w-md">
-              <p className="mb-2 text-sm uppercase tracking-[0.28em] text-[#C87D87]">
-                Register
-              </p>
-              <h2 className="font-serif text-4xl text-[#3B2C34]">
+          <h1
+            style={{
+              fontSize: 'clamp(2rem, 4vw, 3.2rem)',
+              lineHeight: 1.05,
+              fontWeight: 700,
+              color: '#28251d',
+              marginBottom: '0.875rem',
+              maxWidth: '11ch',
+            }}
+          >
+            Start building forms with your own account
+          </h1>
+
+          <p
+            style={{
+              color: '#7a7974',
+              fontSize: '1rem',
+              lineHeight: 1.75,
+              maxWidth: '56ch',
+              marginBottom: '1.5rem',
+            }}
+          >
+            Register once to create forms, save drafts, publish surveys, and manage submissions from your private dashboard.
+          </p>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '0.875rem',
+            }}
+          >
+            {[
+              { title: 'Own your forms', text: 'Each form is connected to the account that created it.' },
+              { title: 'Edit before publish', text: 'Prepare questions and refine drafts before going live.' },
+              { title: 'Review responses', text: 'Track incoming answers inside your workspace.' },
+            ].map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  background: '#fff',
+                  border: '1px solid #e5e5e0',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '8px',
+                    background: '#e6f2f2',
+                    marginBottom: '0.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: '#01696f',
+                    }}
+                  />
+                </div>
+
+                <p
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    color: '#28251d',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  {item.title}
+                </p>
+
+                <p
+                  style={{
+                    color: '#7a7974',
+                    fontSize: '0.875rem',
+                    lineHeight: 1.65,
+                  }}
+                >
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section
+          style={{
+            background: '#fff',
+            border: '1px solid #e5e5e0',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div
+            style={{
+              padding: '0.875rem 1.25rem',
+              borderBottom: '1px solid #f0efeb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+            }}
+          >
+            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#28251d' }}>Create account</span>
+            <span
+              style={{
+                background: '#f3f0ec',
+                color: '#7a7974',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '4px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Secure setup
+            </span>
+          </div>
+
+          <div
+            style={{
+              padding: '1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.875rem',
+            }}
+          >
+            <div style={{ marginBottom: '0.25rem' }}>
+              <h2
+                style={{
+                  fontSize: '1.35rem',
+                  fontWeight: 700,
+                  color: '#28251d',
+                  marginBottom: '0.35rem',
+                }}
+              >
                 Create your account
               </h2>
-              <p className="mt-3 text-sm leading-6 text-[#7A6670]">
-                Use your email and password to access your forms and dashboard.
-              </p>
-
-              <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-[#5A4850]">
-                    Full name
-                  </label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    placeholder="Your full name"
-                    className="w-full rounded-2xl border border-[#E7D7DA] bg-[#FFFDFC] px-4 py-3 text-[#3B2C34] outline-none transition focus:border-[#C87D87] focus:ring-4 focus:ring-[#C87D87]/10"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-[#5A4850]">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="you@example.com"
-                    className="w-full rounded-2xl border border-[#E7D7DA] bg-[#FFFDFC] px-4 py-3 text-[#3B2C34] outline-none transition focus:border-[#C87D87] focus:ring-4 focus:ring-[#C87D87]/10"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-[#5A4850]">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="At least 6 characters"
-                    className="w-full rounded-2xl border border-[#E7D7DA] bg-[#FFFDFC] px-4 py-3 text-[#3B2C34] outline-none transition focus:border-[#C87D87] focus:ring-4 focus:ring-[#C87D87]/10"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-[#5A4850]">
-                    Confirm password
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Repeat your password"
-                    className="w-full rounded-2xl border border-[#E7D7DA] bg-[#FFFDFC] px-4 py-3 text-[#3B2C34] outline-none transition focus:border-[#C87D87] focus:ring-4 focus:ring-[#C87D87]/10"
-                  />
-                </div>
-
-                {error && (
-                  <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {error}
-                  </div>
-                )}
-
-                {success && (
-                  <div className="rounded-2xl border border-[#6B7556]/20 bg-[#6B7556]/10 px-4 py-3 text-sm text-[#556046]">
-                    {success}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded-2xl bg-[#C87D87] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#b96d78] disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {loading ? 'Creating account...' : 'Create account'}
-                </button>
-              </form>
-
-              <p className="mt-6 text-sm text-[#7A6670]">
-                Already have an account?{' '}
-                <Link href="/admin/login" className="font-medium text-[#6B7556] hover:underline">
-                  Log in
-                </Link>
+              <p style={{ color: '#7a7974', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                Use your details to start your private FormCraft workspace.
               </p>
             </div>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+              <div style={fieldStyle}>
+                <label htmlFor="fullName" style={labelStyle}>
+                  Full name
+                </label>
+                <input
+                  id="fullName"
+                  type="text"
+                  name="fullName"
+                  value={form.fullName}
+                  onChange={handleChange}
+                  placeholder="Your full name"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={fieldStyle}>
+                <label htmlFor="email" style={labelStyle}>
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={fieldStyle}>
+                <label htmlFor="password" style={labelStyle}>
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="At least 6 characters"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={fieldStyle}>
+                <label htmlFor="confirmPassword" style={labelStyle}>
+                  Confirm password
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Repeat your password"
+                  style={inputStyle}
+                />
+              </div>
+
+              {error ? (
+                <div
+                  style={{
+                    background: '#fff5f5',
+                    color: '#c53030',
+                    border: '1px solid #fed7d7',
+                    borderRadius: '8px',
+                    padding: '0.75rem 0.875rem',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {error}
+                </div>
+              ) : null}
+
+              {success ? (
+                <div
+                  style={{
+                    background: '#eef5e9',
+                    color: '#437a22',
+                    border: '1px solid #c8dfc0',
+                    borderRadius: '8px',
+                    padding: '0.75rem 0.875rem',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {success}
+                </div>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  ...btnPrimary,
+                  width: '100%',
+                  justifyContent: 'center',
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  marginTop: '0.25rem',
+                }}
+              >
+                {loading ? 'Creating account…' : 'Create account'}
+              </button>
+            </form>
+
+            <p style={{ marginTop: '0.25rem', color: '#7a7974', fontSize: '0.875rem' }}>
+              Already have an account?{' '}
+              <Link
+                href="/admin/login"
+                style={{ color: '#01696f', fontWeight: 600, textDecoration: 'none' }}
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
 }
+
+const fieldStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.375rem',
+};
+
+const labelStyle = {
+  fontSize: '0.825rem',
+  fontWeight: 500,
+  color: '#28251d',
+};
+
+const inputStyle = {
+  padding: '0.6rem 0.875rem',
+  border: '1px solid #d4d1ca',
+  borderRadius: '8px',
+  fontSize: '0.875rem',
+  background: '#fafaf8',
+  width: '100%',
+  transition: 'border-color 180ms ease',
+};
+
+const btnPrimary = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.375rem',
+  background: '#01696f',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  padding: '0.75rem 1.125rem',
+  fontWeight: 500,
+  fontSize: '0.875rem',
+};
