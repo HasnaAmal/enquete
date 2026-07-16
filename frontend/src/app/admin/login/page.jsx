@@ -31,165 +31,248 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background:
-          'radial-gradient(circle at top left, rgba(200,125,135,0.16), transparent 32%), radial-gradient(circle at bottom right, rgba(107,117,86,0.12), transparent 28%), #FDFAF7',
-        display: 'grid',
-        placeItems: 'center',
-        padding: 'clamp(1.25rem, 3vw, 2.5rem)',
-      }}
-    >
-      <div
+    <div style={{ minHeight: '100vh', background: '#f7f6f2' }}>
+      <header
         style={{
-          width: '100%',
-          maxWidth: '1120px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          background: 'rgba(255,255,255,0.82)',
-          border: '1px solid rgba(201, 177, 181, 0.45)',
-          borderRadius: '32px',
-          overflow: 'hidden',
-          boxShadow: '0 24px 70px rgba(91, 68, 77, 0.10)',
-          backdropFilter: 'blur(10px)',
+          background: '#fff',
+          borderBottom: '1px solid #e5e5e0',
+          padding: '0.875rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
         }}
       >
-        <div
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="3" y="3" width="22" height="22" rx="6" stroke="#01696f" strokeWidth="2" />
+            <line x1="8" y1="10" x2="20" y2="10" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="14" x2="17" y2="14" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="18" x2="13" y2="18" stroke="#01696f" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="21" cy="18" r="3.5" fill="#01696f" />
+          </svg>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#28251d' }}>FormCraft</span>
+        </div>
+
+        <Link
+          href="/register"
           style={{
-            padding: 'clamp(2rem, 4vw, 4rem)',
-            background:
-              'linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.08) 100%)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '2rem',
-            borderRight: '1px solid rgba(201, 177, 181, 0.28)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: '#f3f0ec',
+            color: '#28251d',
+            border: '1px solid #d4d1ca',
+            borderRadius: '8px',
+            padding: '0.625rem 1rem',
+            fontWeight: 500,
+            fontSize: '0.875rem',
+            textDecoration: 'none',
           }}
         >
-          <div>
-            <p
-              style={{
-                fontSize: '0.78rem',
-                letterSpacing: '0.28em',
-                textTransform: 'uppercase',
-                color: '#C87D87',
-                marginBottom: '1rem',
-                fontWeight: 700,
-              }}
-            >
-              Inora
-            </p>
+          Create account
+        </Link>
+      </header>
 
-            <h1
+      <div
+        style={{
+          maxWidth: '1120px',
+          margin: '0 auto',
+          padding: '2rem',
+          minHeight: 'calc(100vh - 72px)',
+          display: 'grid',
+          gridTemplateColumns: '1.05fr 420px',
+          gap: '2rem',
+          alignItems: 'center',
+        }}
+      >
+        <section>
+          <div style={{ marginBottom: '1rem' }}>
+            <span
               style={{
-                fontSize: 'clamp(2.1rem, 4vw, 3.6rem)',
-                lineHeight: 1.02,
-                letterSpacing: '-0.04em',
-                color: '#3B2C34',
-                marginBottom: '1rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                padding: '3px 10px',
+                borderRadius: '99px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                background: '#e6f2f2',
+                color: '#01696f',
               }}
             >
-              Welcome back to your form workspace
-            </h1>
-
-            <p
-              style={{
-                color: '#6F5D66',
-                fontSize: '1rem',
-                lineHeight: 1.8,
-                maxWidth: '34rem',
-              }}
-            >
-              Sign in to manage your forms, update questions, and review submissions in one calm, private dashboard.
-            </p>
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: 'currentColor',
+                  display: 'inline-block',
+                }}
+              />
+              Private workspace
+            </span>
           </div>
+
+          <h1
+            style={{
+              fontSize: 'clamp(2rem, 4vw, 3.2rem)',
+              lineHeight: 1.05,
+              fontWeight: 700,
+              color: '#28251d',
+              marginBottom: '0.875rem',
+              maxWidth: '10ch',
+            }}
+          >
+            Build and manage forms in one place
+          </h1>
+
+          <p
+            style={{
+              color: '#7a7974',
+              fontSize: '1rem',
+              lineHeight: 1.75,
+              maxWidth: '56ch',
+              marginBottom: '1.5rem',
+            }}
+          >
+            Sign in to create forms, edit questions, publish surveys, and review incoming responses from your dashboard.
+          </p>
 
           <div
             style={{
               display: 'grid',
-              gap: '0.9rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '0.875rem',
             }}
           >
             {[
-              'Create and manage your own forms',
-              'Edit questions before responses arrive',
-              'Review submissions from your dashboard',
+              { title: 'Draft fast', text: 'Start with a title, add questions, and save anytime.' },
+              { title: 'Publish clearly', text: 'Share live forms with a simple public link.' },
+              { title: 'Track responses', text: 'Review submissions inside your private admin area.' },
             ].map((item) => (
               <div
-                key={item}
+                key={item.title}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.8rem',
-                  color: '#4F3E47',
-                  fontSize: '0.98rem',
-                  background: 'rgba(255,255,255,0.56)',
-                  border: '1px solid rgba(201, 177, 181, 0.22)',
-                  borderRadius: '18px',
-                  padding: '0.95rem 1rem',
+                  background: '#fff',
+                  border: '1px solid #e5e5e0',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                 }}
               >
-                <span
-                  aria-hidden="true"
+                <div
                   style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '999px',
-                    background: '#C87D87',
-                    flexShrink: 0,
-                    boxShadow: '0 0 0 6px rgba(200,125,135,0.12)',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '8px',
+                    background: '#e6f2f2',
+                    marginBottom: '0.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
-                />
-                <span>{item}</span>
+                >
+                  <div
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: '#01696f',
+                    }}
+                  />
+                </div>
+
+                <p
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    color: '#28251d',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  {item.title}
+                </p>
+
+                <p
+                  style={{
+                    color: '#7a7974',
+                    fontSize: '0.875rem',
+                    lineHeight: 1.65,
+                  }}
+                >
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div
+        <section
           style={{
-            padding: 'clamp(2rem, 4vw, 3.5rem)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(255,255,255,0.72)',
+            background: '#fff',
+            border: '1px solid #e5e5e0',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
           }}
         >
-          <div style={{ width: '100%', maxWidth: '420px' }}>
-            <div style={{ marginBottom: '1.5rem' }}>
+          <div
+            style={{
+              padding: '0.875rem 1.25rem',
+              borderBottom: '1px solid #f0efeb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+            }}
+          >
+            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#28251d' }}>Sign in</span>
+            <span
+              style={{
+                background: '#f3f0ec',
+                color: '#7a7974',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '4px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Secure access
+            </span>
+          </div>
+
+          <div
+            style={{
+              padding: '1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.875rem',
+            }}
+          >
+            <div style={{ marginBottom: '0.25rem' }}>
               <h2
                 style={{
-                  fontSize: '1.85rem',
-                  color: '#3B2C34',
-                  marginBottom: '0.45rem',
+                  fontSize: '1.35rem',
+                  fontWeight: 700,
+                  color: '#28251d',
+                  marginBottom: '0.35rem',
                 }}
               >
-                Sign in
+                Welcome back
               </h2>
-
-              <p
-                style={{
-                  color: '#7A6670',
-                  lineHeight: 1.7,
-                  fontSize: '0.98rem',
-                }}
-              >
-                Use your email and password to enter your dashboard.
+              <p style={{ color: '#7a7974', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                Enter your details to continue to your dashboard.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
-              <div>
-                <label
-                  htmlFor="email"
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.45rem',
-                    fontWeight: 600,
-                    color: '#4B3A42',
-                  }}
-                >
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+              <div style={fieldStyle}>
+                <label htmlFor="email" style={labelStyle}>
                   Email
                 </label>
                 <input
@@ -199,51 +282,15 @@ export default function AdminLoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  style={{
-                    width: '100%',
-                    padding: '0.95rem 1rem',
-                    border: '1px solid #E8DCDD',
-                    borderRadius: '16px',
-                    background: '#FFFDFC',
-                    color: '#3B2C34',
-                    outline: 'none',
-                  }}
+                  style={inputStyle}
+                  placeholder="you@example.com"
                 />
               </div>
 
-              <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '0.45rem',
-                    gap: '1rem',
-                  }}
-                >
-                  <label
-                    htmlFor="password"
-                    style={{
-                      fontWeight: 600,
-                      color: '#4B3A42',
-                    }}
-                  >
-                    Password
-                  </label>
-
-                  <Link
-                    href="/forgot-password"
-                    style={{
-                      color: '#6B7556',
-                      fontSize: '0.92rem',
-                      textDecoration: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-
+              <div style={fieldStyle}>
+                <label htmlFor="password" style={labelStyle}>
+                  Password
+                </label>
                 <input
                   id="password"
                   type="password"
@@ -251,27 +298,20 @@ export default function AdminLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  style={{
-                    width: '100%',
-                    padding: '0.95rem 1rem',
-                    border: '1px solid #E8DCDD',
-                    borderRadius: '16px',
-                    background: '#FFFDFC',
-                    color: '#3B2C34',
-                    outline: 'none',
-                  }}
+                  style={inputStyle}
+                  placeholder="Enter your password"
                 />
               </div>
 
               {error ? (
                 <div
                   style={{
-                    background: '#FFF3F4',
-                    color: '#B42318',
-                    border: '1px solid #F2C7CD',
-                    borderRadius: '16px',
-                    padding: '0.85rem 0.95rem',
-                    fontSize: '0.93rem',
+                    background: '#fff5f5',
+                    color: '#c53030',
+                    border: '1px solid #fed7d7',
+                    borderRadius: '8px',
+                    padding: '0.75rem 0.875rem',
+                    fontSize: '0.875rem',
                   }}
                 >
                   {error}
@@ -282,44 +322,65 @@ export default function AdminLoginPage() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  marginTop: '0.35rem',
-                  background: '#C87D87',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '16px',
-                  padding: '1rem 1.1rem',
-                  fontWeight: 700,
+                  ...btnPrimary,
+                  width: '100%',
+                  justifyContent: 'center',
+                  opacity: loading ? 0.7 : 1,
                   cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.75 : 1,
-                  boxShadow: '0 14px 30px rgba(200,125,135,0.22)',
+                  marginTop: '0.25rem',
                 }}
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? 'Signing in…' : 'Sign in'}
               </button>
             </form>
 
-            <p
-              style={{
-                marginTop: '1.25rem',
-                color: '#7A6670',
-                fontSize: '0.95rem',
-              }}
-            >
-              New here?{' '}
+            <p style={{ marginTop: '0.25rem', color: '#7a7974', fontSize: '0.875rem' }}>
+              Don&apos;t have an account?{' '}
               <Link
                 href="/register"
-                style={{
-                  color: '#6B7556',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                }}
+                style={{ color: '#01696f', fontWeight: 600, textDecoration: 'none' }}
               >
-                Create an account
+                Create one
               </Link>
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
 }
+
+const fieldStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.375rem',
+};
+
+const labelStyle = {
+  fontSize: '0.825rem',
+  fontWeight: 500,
+  color: '#28251d',
+};
+
+const inputStyle = {
+  padding: '0.6rem 0.875rem',
+  border: '1px solid #d4d1ca',
+  borderRadius: '8px',
+  fontSize: '0.875rem',
+  background: '#fafaf8',
+  width: '100%',
+  transition: 'border-color 180ms ease',
+};
+
+const btnPrimary = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.375rem',
+  background: '#01696f',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  padding: '0.75rem 1.125rem',
+  fontWeight: 500,
+  fontSize: '0.875rem',
+};
