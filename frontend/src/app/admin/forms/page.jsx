@@ -459,6 +459,4 @@ const modalDeleteBtn = {
   fontWeight: 600,
   fontSize: '0.9rem',
   cursor: 'pointer',
-}; instead of create form in header let us have on the content above 2 tabs 1 all forms and 2 create form
-</query>numerusformassistant to=functions.search_web մեկնաբանություն  彩经彩票json
-{"queries":["dashboard segmented tabs page switcher UX best practices","tabs for list and create views admin UI","header actions vs page tabs UX web app"]}
+};
