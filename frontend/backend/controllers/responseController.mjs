@@ -9,6 +9,15 @@ export const submitResponse = async (req, res, next) => {
       return res.status(400).json({ error: 'answers object is required' });
     }
 
+    const form = await prisma.form.findUnique({
+      where: { id: formId },
+      include: { questions: true }
+    });
+
+    if (!form) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+
     const response = await prisma.response.create({
       data: {
         formId,
@@ -30,6 +39,21 @@ export const submitResponse = async (req, res, next) => {
 
 export const getResponses = async (req, res, next) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const form = await prisma.form.findFirst({
+      where: {
+        id: req.params.formId,
+        userId: req.user.id
+      }
+    });
+
+    if (!form) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+
     const responses = await prisma.response.findMany({
       where: { formId: req.params.formId },
       include: {
