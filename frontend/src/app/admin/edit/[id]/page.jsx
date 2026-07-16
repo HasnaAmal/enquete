@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { PlusCircle, Trash2, Save, Plus, X, ArrowLeft } from 'lucide-react';
@@ -93,77 +94,65 @@ export default function EditFormPage({ params }) {
   };
 
   const saveChanges = async () => {
-  if (!title.trim()) {
-    toast.error('Add a title first.');
-    return;
-  }
+    if (!title.trim()) {
+      toast.error('Add a title first.');
+      return;
+    }
 
-  if (!questions.length) {
-    toast.error('Add at least one question.');
-    return;
-  }
+    if (!questions.length) {
+      toast.error('Add at least one question.');
+      return;
+    }
 
-  setSaving(true);
+    setSaving(true);
 
-  try {
-    const formUpdateResult = await api.updateForm(formId, {
-      title,
-      description,
-      status: published ? 'PUBLISHED' : 'DRAFT',
-    });
+    try {
+      await api.updateForm(formId, {
+        title,
+        description,
+        status: published ? 'PUBLISHED' : 'DRAFT',
+      });
 
-    console.log('FORM UPDATE OK:', formUpdateResult);
+      const cleanedQuestions = questions.map((q) => ({
+        text: q.text,
+        type: q.type,
+        required: q.required,
+        options: q.options || [],
+      }));
 
-    const cleanedQuestions = questions.map((q) => ({
-      text: q.text,
-      type: q.type,
-      required: q.required,
-      options: q.options || [],
-    }));
+      await api.saveQuestions(formId, cleanedQuestions);
+      toast.success('Form updated!');
+    } catch (error) {
+      toast.error(error?.response?.data?.error || error?.message || 'Update failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
-    console.log('SENDING QUESTIONS:', cleanedQuestions);
+  const publishForm = async () => {
+    if (!formId) return;
 
-    const saveQuestionsResult = await api.saveQuestions(formId, cleanedQuestions);
-    console.log('QUESTIONS SAVE OK:', saveQuestionsResult);
+    setSaving(true);
 
-    toast.success('Form updated!');
-  } catch (error) {
-  toast.error(
-    error?.response?.data?.error ||
-    error?.message ||
-    'Update failed.'
-  );
-} finally {
-  setSaving(false);
-}
-};
-const publishForm = async () => {
-  if (!formId) return;
+    try {
+      await api.updateForm(formId, {
+        title,
+        description,
+        status: 'PUBLISHED',
+      });
 
-  setSaving(true);
+      setPublished(true);
+      toast.success('Form published!');
+    } catch (error) {
+      toast.error(error?.response?.data?.error || error?.message || 'Publish failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  try {
-    await api.updateForm(formId, {
-      title,
-      description,
-      status: 'PUBLISHED',
-    });
-
-    setPublished(true);
-    toast.success('Form published!');
-  } catch (error) {
-    toast.error(
-      error?.response?.data?.error ||
-      error?.message ||
-      'Publish failed.'
-    );
-  } finally {
-    setSaving(false);
-  }
-};
   if (loading) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: '#777' }}>
+      <div style={{ minHeight: '100vh', background: '#f7f6f2', padding: '3rem', textAlign: 'center', color: '#777' }}>
         Loading form...
       </div>
     );
@@ -183,10 +172,12 @@ const publishForm = async () => {
           top: 0,
           zIndex: 50,
           boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          gap: '1rem',
+          flexWrap: 'wrap',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <Link
             href="/admin/forms"
             style={{
               display: 'inline-flex',
@@ -200,21 +191,36 @@ const publishForm = async () => {
           >
             <ArrowLeft size={14} />
             Back
-          </a>
-          <span style={{ fontWeight: 700 }}>Edit Form</span>
-        </div>
-<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-  {!published && (
-    <button onClick={publishForm} disabled={saving} style={btnSecondary}>
-      {saving ? 'Publishing…' : 'Publish'}
-    </button>
-  )}
+          </Link>
 
-  <button onClick={saveChanges} disabled={saving} style={btnPrimary}>
-    <Save size={14} />
-    {saving ? 'Saving…' : 'Save Changes'}
-  </button>
-</div>
+          <span style={{ fontWeight: 700, color: '#28251d' }}>Edit Form</span>
+
+          <span
+            style={{
+              background: published ? '#eef5e9' : '#f3f0ec',
+              color: published ? '#437a22' : '#7a7974',
+              borderRadius: '999px',
+              padding: '4px 10px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+            }}
+          >
+            {published ? 'Published' : 'Draft'}
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {!published && (
+            <button onClick={publishForm} disabled={saving} style={btnSecondary}>
+              {saving ? 'Publishing…' : 'Publish'}
+            </button>
+          )}
+
+          <button onClick={saveChanges} disabled={saving} style={btnPrimary}>
+            <Save size={14} />
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+        </div>
       </header>
 
       <div
@@ -233,6 +239,7 @@ const publishForm = async () => {
             <div style={panelHeader}>
               <span style={panelTitle}>Form Settings</span>
             </div>
+
             <div style={panelBody}>
               <div style={fieldStyle}>
                 <label style={labelStyle}>Title</label>
@@ -240,6 +247,7 @@ const publishForm = async () => {
                   style={inputStyle}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Form title"
                 />
               </div>
 
@@ -249,6 +257,7 @@ const publishForm = async () => {
                   style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
                   value={description}
                   onChange={(e) => setDesc(e.target.value)}
+                  placeholder="Form description"
                 />
               </div>
             </div>
@@ -258,6 +267,7 @@ const publishForm = async () => {
             <div style={panelHeader}>
               <span style={panelTitle}>Add Question</span>
             </div>
+
             <div style={panelBody}>
               <div style={fieldStyle}>
                 <label style={labelStyle}>Question Type</label>
@@ -283,6 +293,7 @@ const publishForm = async () => {
               {HAS_OPTIONS.includes(qType) && (
                 <div style={fieldStyle}>
                   <label style={labelStyle}>Answer Options</label>
+
                   {qOptions.map((opt, i) => (
                     <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
                       <input
@@ -290,12 +301,22 @@ const publishForm = async () => {
                         value={opt}
                         onChange={(e) => updateOption(i, e.target.value)}
                       />
-                      <button onClick={() => removeOption(i)} style={{ color: '#aaa' }}>
+                      <button
+                        type="button"
+                        onClick={() => removeOption(i)}
+                        style={{
+                          color: '#aaa',
+                          padding: '0 0.5rem',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                        }}
+                      >
                         <X size={14} />
                       </button>
                     </div>
                   ))}
-                  <button onClick={addOption} style={{ ...btnSecondary, width: '100%' }}>
+
+                  <button type="button" onClick={addOption} style={{ ...btnSecondary, width: '100%', justifyContent: 'center' }}>
                     <Plus size={12} />
                     Add Option
                   </button>
@@ -304,14 +325,36 @@ const publishForm = async () => {
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <label style={labelStyle}>Required</label>
-                <input
-                  type="checkbox"
-                  checked={qRequired}
-                  onChange={(e) => setQRequired(e.target.checked)}
-                />
+
+                <div
+                  onClick={() => setQRequired((p) => !p)}
+                  style={{
+                    width: '40px',
+                    height: '22px',
+                    borderRadius: '99px',
+                    background: qRequired ? '#01696f' : '#d4d1ca',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'background 200ms ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '3px',
+                      left: qRequired ? '21px' : '3px',
+                      width: '16px',
+                      height: '16px',
+                      background: '#fff',
+                      borderRadius: '50%',
+                      transition: 'left 200ms ease',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                </div>
               </div>
 
-              <button onClick={addQuestion} style={{ ...btnPrimary, width: '100%' }}>
+              <button onClick={addQuestion} style={{ ...btnPrimary, width: '100%', justifyContent: 'center' }}>
                 <PlusCircle size={16} />
                 Add Question
               </button>
@@ -320,53 +363,156 @@ const publishForm = async () => {
         </aside>
 
         <main>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.25rem' }}>{title}</h1>
-          <p style={{ color: '#7a7974', marginBottom: '1rem' }}>{description || 'No description'}</p>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.25rem', color: '#28251d' }}>
+              {title || 'Untitled Form'}
+            </h1>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            {questions.map((q, i) => (
-              <div
-                key={q.id}
+            <p style={{ color: '#7a7974', fontSize: '0.9rem' }}>
+              {description || 'No description yet.'}
+            </p>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+              <span
                 style={{
-                  background: '#fff',
-                  border: '1px solid #e5e5e0',
-                  borderRadius: '12px',
-                  padding: '1.25rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: '1rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  padding: '3px 10px',
+                  borderRadius: '99px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  background: published ? '#eef5e9' : '#f3f0ec',
+                  color: published ? '#437a22' : '#7a7974',
                 }}
               >
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 600, marginBottom: '0.35rem' }}>
-                    {i + 1}. {q.text} {q.required && <span style={{ color: '#e53e3e' }}>*</span>}
-                  </p>
-                  {q.options?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                      {q.options.map((o, oi) => (
-                        <span
-                          key={oi}
-                          style={{
-                            background: '#f3f0ec',
-                            color: '#7a7974',
-                            fontSize: '0.75rem',
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                          }}
-                        >
-                          {o}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <span
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: 'currentColor',
+                    display: 'inline-block',
+                  }}
+                />
+                {published ? 'Published' : 'Draft'}
+              </span>
 
-                <button onClick={() => deleteQuestion(q.id)} style={{ color: '#ccc' }}>
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))}
+              <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
+                {questions.length} question{questions.length !== 1 ? 's' : ''}
+              </span>
+            </div>
           </div>
+
+          {questions.length === 0 ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '5rem 2rem',
+                background: '#fff',
+                borderRadius: '16px',
+                border: '2px dashed #e5e5e0',
+                color: '#bbb',
+              }}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📋</div>
+              <p style={{ fontWeight: 500, color: '#7a7974', marginBottom: '0.25rem' }}>No questions yet</p>
+              <p style={{ fontSize: '0.875rem' }}>Use the panel on the left to add your first question.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+              {questions.map((q, i) => (
+                <div
+                  key={q.id}
+                  style={{
+                    background: '#fff',
+                    border: '1px solid #e5e5e0',
+                    borderRadius: '12px',
+                    padding: '1.25rem',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', flex: 1 }}>
+                    <span
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '6px',
+                        background: '#01696f',
+                        color: '#fff',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        marginTop: '1px',
+                      }}
+                    >
+                      {i + 1}
+                    </span>
+
+                    <div>
+                      <p style={{ fontWeight: 500, fontSize: '0.9rem', marginBottom: '0.375rem', color: '#28251d' }}>
+                        {q.text}
+                        {q.required && <span style={{ color: '#e53e3e', marginLeft: '3px' }}>*</span>}
+                      </p>
+
+                      {q.options.length > 0 && (
+                        <ul style={{ listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
+                          {q.options.map((o, oi) => (
+                            <li
+                              key={oi}
+                              style={{
+                                background: '#f3f0ec',
+                                fontSize: '0.75rem',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                color: '#7a7974',
+                              }}
+                            >
+                              {o}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                    <span
+                      style={{
+                        background: '#f3f0ec',
+                        color: '#7a7974',
+                        fontSize: '0.7rem',
+                        fontWeight: 500,
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      {QUESTION_TYPES.find((t) => t.value === q.type)?.label}
+                    </span>
+
+                    <button
+                      onClick={() => deleteQuestion(q.id)}
+                      style={{
+                        color: '#ccc',
+                        padding: '0.25rem',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </main>
       </div>
     </div>
@@ -378,6 +524,7 @@ const panel = {
   border: '1px solid #e5e5e0',
   borderRadius: '12px',
   overflow: 'hidden',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
 };
 
 const panelHeader = {
