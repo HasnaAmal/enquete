@@ -138,7 +138,7 @@ export default function AdminPage() {
     try {
       setLoggingOut(true);
       await logout();
-      router.push('/login');
+      router.push('/');
       router.refresh();
     } catch {
       toast.error('Could not log out. Please try again.');
