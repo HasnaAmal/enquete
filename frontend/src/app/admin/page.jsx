@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { PlusCircle, Trash2, Send, Save, Plus, X } from 'lucide-react';
+import { PlusCircle, Trash2, Send, Save, Plus, X, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 const QUESTION_TYPES = [
   { value: 'short', label: 'Short Text' },
@@ -16,12 +18,16 @@ const QUESTION_TYPES = [
 const HAS_OPTIONS = ['radio', 'checkbox', 'select'];
 
 export default function AdminPage() {
+  const router = useRouter();
+  const { logout } = useAuth();
+
   const [title, setTitle] = useState('');
   const [description, setDesc] = useState('');
   const [questions, setQuestions] = useState([]);
   const [formId, setFormId] = useState(null);
   const [published, setPublished] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const [qText, setQText] = useState('');
   const [qType, setQType] = useState('short');
@@ -128,6 +134,19 @@ export default function AdminPage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await logout();
+      router.push('/login');
+      router.refresh();
+    } catch {
+      toast.error('Could not log out. Please try again.');
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#f7f6f2' }}>
       <header
@@ -142,6 +161,8 @@ export default function AdminPage() {
           top: 0,
           zIndex: 50,
           boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          gap: '1rem',
+          flexWrap: 'wrap',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
@@ -169,32 +190,33 @@ export default function AdminPage() {
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.625rem' }}>
-         <a
-  href="/admin/forms"
-  style={{
-    display: 'inline-flex',
-    alignItems: 'center',
-    background: '#f3f0ec',
-    color: '#28251d',
-    border: '1px solid #d4d1ca',
-    borderRadius: '8px',
-    padding: '0.625rem 1rem',
-    fontWeight: 500,
-    fontSize: '0.875rem',
-    textDecoration: 'none'
-  }}
->
-  All Forms
-</a>
-          <button onClick={saveForm} disabled={saving} style={btnSecondary}>
+        <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
+          <a
+            href="/admin/forms"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: '#f3f0ec',
+              color: '#28251d',
+              border: '1px solid #d4d1ca',
+              borderRadius: '8px',
+              padding: '0.625rem 1rem',
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              textDecoration: 'none'
+            }}
+          >
+            All Forms
+          </a>
+
+          <button onClick={saveForm} disabled={saving || loggingOut} style={btnSecondary}>
             <Save size={14} />
             {saving ? 'Saving…' : 'Save Draft'}
           </button>
 
           <button
             onClick={publishForm}
-            disabled={saving || published}
+            disabled={saving || published || loggingOut}
             style={{
               ...btnPrimary,
               opacity: published ? 0.6 : 1,
@@ -204,7 +226,16 @@ export default function AdminPage() {
             <Send size={14} />
             {published ? 'Published ✓' : 'Publish Form'}
           </button>
-          
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={loggingOut || saving}
+            style={btnLogout}
+          >
+            <LogOut size={14} />
+            {loggingOut ? 'Logging out…' : 'Logout'}
+          </button>
         </div>
       </header>
 
@@ -241,7 +272,6 @@ export default function AdminPage() {
           >
             View responses
           </a>
-          
         </div>
       )}
 
@@ -331,14 +361,16 @@ export default function AdminPage() {
                       />
 
                       <button
+                        type="button"
                         onClick={() => removeOption(i)}
                         style={{
                           color: '#aaa',
                           padding: '0 0.5rem',
                           transition: 'color 180ms ease',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#e53e3e')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = '#aaa')}
                       >
                         <X size={14} />
                       </button>
@@ -346,6 +378,7 @@ export default function AdminPage() {
                   ))}
 
                   <button
+                    type="button"
                     onClick={addOption}
                     style={{
                       ...btnSecondary,
@@ -391,7 +424,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <button onClick={addQuestion} style={{ ...btnPrimary, width: '100%' }}>
+              <button type="button" onClick={addQuestion} style={{ ...btnPrimary, width: '100%' }}>
                 <PlusCircle size={16} />
                 Add Question
               </button>
@@ -535,15 +568,17 @@ export default function AdminPage() {
                     </span>
 
                     <button
+                      type="button"
                       onClick={() => deleteQuestion(q.id)}
                       style={{
                         color: '#ccc',
                         padding: '0.25rem',
                         transition: 'color 180ms ease',
                         borderRadius: '6px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = '#e53e3e')}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = '#ccc')}
                     >
                       <Trash2 size={15} />
                     </button>
@@ -628,6 +663,20 @@ const btnSecondary = {
   border: '1px solid #d4d1ca',
   borderRadius: '8px',
   padding: '0.625rem 1.125rem',
+  fontWeight: 500,
+  fontSize: '0.875rem',
+  cursor: 'pointer',
+};
+
+const btnLogout = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.375rem',
+  background: '#fff',
+  color: '#7a7974',
+  border: '1px solid #e5e5e0',
+  borderRadius: '8px',
+  padding: '0.625rem 1rem',
   fontWeight: 500,
   fontSize: '0.875rem',
   cursor: 'pointer',
