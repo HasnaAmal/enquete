@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -19,7 +19,7 @@ const HAS_OPTIONS = ['radio', 'checkbox', 'select'];
 
 export default function AdminPage() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   const [title, setTitle] = useState('');
   const [description, setDesc] = useState('');
@@ -33,6 +33,31 @@ export default function AdminPage() {
   const [qType, setQType] = useState('short');
   const [qRequired, setQRequired] = useState(false);
   const [qOptions, setQOptions] = useState(['Option 1', 'Option 2']);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [loading, user, router]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          background: '#f7f6f2',
+          color: '#7a7974',
+          fontSize: '0.95rem',
+        }}
+      >
+        Checking session...
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   const addOption = () => setQOptions((p) => [...p, `Option ${p.length + 1}`]);
   const removeOption = (i) => setQOptions((p) => p.filter((_, idx) => idx !== i));
@@ -138,7 +163,7 @@ export default function AdminPage() {
     try {
       setLoggingOut(true);
       await logout();
-      router.push('/');
+      router.replace('/');
       router.refresh();
     } catch {
       toast.error('Could not log out. Please try again.');
@@ -146,7 +171,6 @@ export default function AdminPage() {
       setLoggingOut(false);
     }
   };
-
   return (
     <div style={{ minHeight: '100vh', background: '#f7f6f2' }}>
       <header
